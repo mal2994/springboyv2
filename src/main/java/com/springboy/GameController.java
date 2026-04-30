@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Map;
 
 @RestController
@@ -26,9 +25,9 @@ public class GameController {
 
     @GetMapping(value = "/game", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> game(@RequestParam(required = false, defaultValue = "abc123") String session) throws IOException {
-        // Serve static PNG from resources
+        // Serve static PNG from resources - use InputStream for JAR compatibility
         Resource resource = new ClassPathResource("static/game.png");
-        byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
+        byte[] imageBytes = resource.getInputStream().readAllBytes();
         
         // Explicitly set HTTP headers
         HttpHeaders headers = new HttpHeaders();

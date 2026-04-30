@@ -1,6 +1,7 @@
 package com.springboy;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +25,8 @@ public class GameController {
         return Map.of("status", "ok");
     }
 
-    @GetMapping(value = "/game", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<?> game(@RequestParam(required = false, defaultValue = "abc123") String session) throws IOException {
+    @GetMapping(value = "/game", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> game(@RequestParam(required = false, defaultValue = "abc123") String session) throws IOException {
         // Create a simple 128x128 PNG with a solid color
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -48,8 +49,6 @@ public class GameController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(imageBytes);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 }

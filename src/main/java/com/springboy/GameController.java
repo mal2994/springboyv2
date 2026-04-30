@@ -1,5 +1,7 @@
 package com.springboy;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,11 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 @RestController
@@ -27,28 +26,33 @@ public class GameController {
 
     @GetMapping(value = "/game", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> game(@RequestParam(required = false, defaultValue = "abc123") String session) throws IOException {
-        // Create a simple 128x128 PNG with a solid color
-        BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
+        // Serve static PNG from resources
+        Resource resource = new ClassPathResource("static/game.png");
+        byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
         
-        // Fill with black background
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, 128, 128);
-        
-        // Draw a simple "HELLO" text in white
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Monospaced", Font.BOLD, 20));
-        g.drawString("HELLO", 30, 64);
-        
-        g.dispose();
-        
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        byte[] imageBytes = baos.toByteArray();
-        
+        // Explicitly set HTTP headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
+
+    // === Dynamic PNG generation (commented out - requires headless graphics) ===
+    // @GetMapping(value = "/game", produces = MediaType.IMAGE_PNG_VALUE)
+    // public ResponseEntity<byte[]> gameDynamic(@RequestParam(required = false, defaultValue = "abc123") String session) throws IOException {
+    //     BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+    //     Graphics2D g = image.createGraphics();
+    //     g.setColor(Color.BLACK);
+    //     g.fillRect(0, 0, 128, 128);
+    //     g.setColor(Color.WHITE);
+    //     g.setFont(new Font("Monospaced", Font.BOLD, 20));
+    //     g.drawString("HELLO", 30, 64);
+    //     g.dispose();
+    //     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    //     ImageIO.write(image, "png", baos);
+    //     byte[] imageBytes = baos.toByteArray();
+    //     HttpHeaders headers = new HttpHeaders();
+    //     headers.setContentType(MediaType.IMAGE_PNG);
+    //     return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    // }
 }

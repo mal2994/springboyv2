@@ -1,0 +1,1 @@
+web: java -jar target/springboy-0.0.1-SNAPSHOT.jar
